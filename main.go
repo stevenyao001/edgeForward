@@ -16,7 +16,7 @@ func main() {
 	edge := edgeCommon.New()
 
 	filePath, _ := os.Getwd()
-	edge.RegisterConfig(filePath+"/conf/local.yaml", &global.Conf)
+	edge.RegisterConfig(filePath+"/conf/dong.yaml", &global.Conf)
 
 	edge.RegisterLogger(global.Conf.Log.MainPath)
 

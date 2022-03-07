@@ -9,7 +9,7 @@ var Subscribes = map[string][]mqtt.SubscribeOpts{
 	"rootcloud": {
 		//新采集数据
 		{
-			Topic:    "$ROOTCLOUD/thing/realtimedata/+",
+			Topic:    "$ROOTEDGE/thing/realtimedata/+",
 			Qos:      0,
 			Callback: collector_data_report.CollectorDataReport,
 		},

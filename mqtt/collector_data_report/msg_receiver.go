@@ -29,7 +29,7 @@ var CollectorDataReport = func(client mqtt2.Client, msg mqtt2.Message) {
 	msgSend := MsgNew()
 	msgSend.Content["testRoot"] = string(msg.Payload())
 
-	_, _ = mqttClient.Publish("$ROOTCLOUD/thing/upload", msgSend, 2, false)
+	_, _ = mqttClient.Publish("$ROOTEDGE/thing/upload", msgSend, 2, false)
 
 	//msgEntity := mqtt2.MsgPool.Get().(mqtt2.Msg)
 	//defer mqtt2.MsgPool.Put(msgEntity)

@@ -1,6 +1,7 @@
 package dataSource
 
 import (
+	"encoding/json"
 	"fmt"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/stevenyao001/edgeCommon/mqtt"
@@ -14,13 +15,18 @@ type DataSource struct {
 }
 
 /* define new struct collectData for marshal */
+
+type DD struct {
+	Properties *CollectData `json:"properties"`
+	Ts         int          `json:"ts"`
+}
 type CollectData struct {
-	MegnetStatus bool `json:""`
+	MegnetStatus bool `json:"megnet_status"`
 	//MegnetStatusCnt int64 `json:""`
 	//Status          int32 `json:""`
-	Ia int `json:""`
+	Ia int `json:"ia"`
 	//Threadhold      int32 `json:""`
-	Ep int64 `json:""`
+	Ep int64 `json:"ep"`
 	//InstantEp       int32 `json:""`
 }
 
@@ -44,6 +50,14 @@ func (d *DataSource) createData() {
 	 * @Date: 2022/3/4 下午2:28
 	 */
 	cData := d.initData()
+
+	mqttClient := mqtt.GetClient("rootcloud")
+
+	msgSend := d.msgNew()
+	msgSend.DeviceId = "18"
+	msgSend.Cmd = 101001
+	_, _ = mqttClient.Publish("$ROOTEDGE/thing/model/18", msgSend, 2, false)
+	time.Sleep(time.Second)
 	for true {
 		if rand.Intn(2) == 1 {
 			cData.MegnetStatus = true
@@ -54,14 +68,20 @@ func (d *DataSource) createData() {
 		cData.Ep = d.GlobalCount
 		d.GlobalCount += 1
 
-		json, _ := jsoniter.Marshal(cData)
-		fmt.Println("new data: ", string(json))
+		dd := DD{
+			Properties: cData,
+			Ts:         123456,
+		}
+		jsons, _ := jsoniter.Marshal(dd)
+		fmt.Println("new data: ", string(jsons))
 		mqttClient := mqtt.GetClient("rootcloud")
 
 		msgSend := d.msgNew()
-		msgSend.Content["testRoot"] = string(json)
+		msgSend.DeviceId = "18"
 
-		_, _ = mqttClient.Publish("$ROOTCLOUD/datasource/rawdata/18", msgSend, 2, false)
+		json.Unmarshal(jsons, &msgSend.Content)
+
+		_, _ = mqttClient.Publish("$ROOTEDGE/datasource/rawdata/18", msgSend, 2, false)
 		time.Sleep(60 * time.Second)
 	}
 	return
